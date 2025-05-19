@@ -25,19 +25,22 @@
 #define MAX_TRANSACTIONS_IN_STATEMENT 5
 
 // Account type enum
-typedef enum {
+typedef enum
+{
     SAVINGS,
     CHECKING
 } AccountType;
 
 // Transaction type enum
-typedef enum {
+typedef enum
+{
     DEPOSIT,
     WITHDRAWAL
 } TransactionType;
 
 // Transaction structure
-typedef struct {
+typedef struct
+{
     time_t timestamp;
     TransactionType type;
     double amount;
@@ -45,7 +48,8 @@ typedef struct {
 } Transaction;
 
 // Account structure
-typedef struct {
+typedef struct
+{
     char accountNumber[ACC_NUM_LENGTH + 1];
     char pin[PIN_LENGTH + 1];
     char name[MAX_NAME_LENGTH + 1];
@@ -58,18 +62,20 @@ typedef struct {
 } Account;
 
 // Request type enum
-typedef enum {
+typedef enum
+{
     OPEN_ACCOUNT,
     CLOSE_ACCOUNT,
     WITHDRAW,
-    DEPOSIT,
+    DEPOSIT_FUNDS,
     CHECK_BALANCE,
     GET_STATEMENT,
     INVALID_REQUEST
 } RequestType;
 
 // Request structure
-typedef struct {
+typedef struct
+{
     RequestType type;
     char accountNumber[ACC_NUM_LENGTH + 1];
     char pin[PIN_LENGTH + 1];
@@ -80,7 +86,8 @@ typedef struct {
 } Request;
 
 // Response structure
-typedef struct {
+typedef struct
+{
     int success;
     char message[MAX_BUFFER];
     char accountNumber[ACC_NUM_LENGTH + 1];
@@ -91,19 +98,23 @@ typedef struct {
 } Response;
 
 // Helper functions
-void generateAccountNumber(char *accountNumber) {
-    sprintf(accountNumber, "%010d", rand() % 10000000000);
+void generateAccountNumber(char *accountNumber)
+{
+    sprintf(accountNumber, "%010ld", rand() % 10000000000L);
 }
 
-void generatePIN(char *pin) {
+void generatePIN(char *pin)
+{
     sprintf(pin, "%06d", rand() % 1000000);
 }
 
-const char* getAccountTypeString(AccountType type) {
+const char *getAccountTypeString(AccountType type)
+{
     return type == SAVINGS ? "Savings" : "Checking";
 }
 
-const char* getTransactionTypeString(TransactionType type) {
+const char *getTransactionTypeString(TransactionType type)
+{
     return type == DEPOSIT ? "Deposit" : "Withdrawal";
 }
 
