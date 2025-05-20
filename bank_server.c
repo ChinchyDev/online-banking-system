@@ -3,6 +3,48 @@
 
 Account accounts[MAX_ACCOUNTS];
 int accountCount = 0;
+const char *DATABASE_FILE = "bank_data.dat";
+
+// Function to save accounts to file
+void saveAccountsToFile()
+{
+    FILE *file = fopen(DATABASE_FILE, "wb");
+    if (file == NULL)
+    {
+        perror("Error opening file for writing");
+        return;
+    }
+
+    // First write the accountCount
+    fwrite(&accountCount, sizeof(int), 1, file);
+
+    // Then write all accounts
+    fwrite(accounts, sizeof(Account), accountCount, file);
+
+    fclose(file);
+    printf("Account data saved to file successfully.\n");
+}
+
+// Function to load accounts from file
+void loadAccountsFromFile()
+{
+    FILE *file = fopen(DATABASE_FILE, "rb");
+    if (file == NULL)
+    {
+        perror("No existing account database found");
+        accountCount = 0;
+        return;
+    }
+
+    // First read the accountCount
+    fread(&accountCount, sizeof(int), 1, file);
+
+    // Then read all accounts
+    fread(accounts, sizeof(Account), accountCount, file);
+
+    fclose(file);
+    printf("Loaded %d accounts from database file.\n", accountCount);
+}
 
 // Function to add a transaction to an account
 void addTransaction(Account *account, TransactionType type, double amount, const char *description)
@@ -26,6 +68,9 @@ void addTransaction(Account *account, TransactionType type, double amount, const
 
     account->transactions[account->transactionCount] = transaction;
     account->transactionCount++;
+
+    // Save accounts to file after any transaction
+    saveAccountsToFile();
 }
 
 // Function to find an account by account number
@@ -86,6 +131,9 @@ Response openAccount(const Request *request)
     accounts[accountCount] = newAccount;
     accountCount++;
 
+    // Save accounts to file after creating a new account
+    saveAccountsToFile();
+
     response.success = 1;
     strcpy(response.accountNumber, newAccount.accountNumber);
     strcpy(response.pin, newAccount.pin);
@@ -116,6 +164,9 @@ Response closeAccount(const Request *request)
     }
 
     account->isActive = 0;
+
+    // Save accounts to file after closing an account
+    saveAccountsToFile();
 
     response.success = 1;
     response.balance = account->balance;
@@ -304,6 +355,9 @@ Response processRequest(const Request *request)
 int main()
 {
     srand(time(NULL));
+
+    // Load accounts from file at startup
+    loadAccountsFromFile();
 
     int server_fd, new_socket;
     struct sockaddr_in address;
